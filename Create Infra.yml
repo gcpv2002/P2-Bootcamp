@@ -1,0 +1,110 @@
+trigger:
+  branches:
+    include:
+      - main
+
+  paths:
+    include:
+      - Terraform
+
+pool:
+  name: Default
+
+stages:
+  - stage: StageEnv
+    displayName: 'Stage Environment'
+    jobs:
+      - job: TerraformStage
+        displayName: 'Terraform Stage'
+        steps:
+          - task: TerraformInstaller@1
+            displayName: 'Terraform install'
+            inputs:
+              terraformVersion: 'latest'
+
+          - task: TerraformTask@5
+            displayName: 'Terraform init'
+            inputs:
+              provider: 'azurerm'
+              command: 'init'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/Terraform/Stage'
+              backendAzureRmUseEntraIdForAuthentication: false
+              backendServiceArm: 'Azure subscription 1(5fa73faf-6a16-4e4e-a3c0-a3f4f7415956)'
+              backendAzureRmResourceGroupName: 'stateFiles-RG'
+              backendAzureRmStorageAccountName: 'statefilesforp2'
+              backendAzureRmContainerName: 'stagestatefiles'
+              backendAzureRmKey: 'stage.tfstate'
+
+          - task: TerraformTask@5
+            displayName: 'Terraform validate'
+            inputs:
+              provider: 'azurerm'
+              command: 'validate'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/Terraform/Stage'
+
+          - task: TerraformTask@5
+            displayName: 'Terraform plan'
+            inputs:
+              provider: 'azurerm'
+              command: 'plan'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/Terraform/Stage'
+              commandOptions: '--var-file="Stage.tfvars"'
+              environmentServiceNameAzureRM: 'Azure subscription 1(5fa73faf-6a16-4e4e-a3c0-a3f4f7415956)'
+
+          - task: TerraformTask@5
+            displayName: 'Terraform apply'
+            inputs:
+              provider: 'azurerm'
+              command: 'apply'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/Terraform/Stage'
+              commandOptions: '--var-file="Stage.tfvars" --auto-approve'
+              environmentServiceNameAzureRM: 'Azure subscription 1(5fa73faf-6a16-4e4e-a3c0-a3f4f7415956)'
+
+  - stage: DevEnv
+    displayName: 'Dev Environment'
+    jobs:
+      - job: TerraformDev
+        displayName: 'Terraform Dev'
+        steps:
+          - task: TerraformInstaller@1
+            displayName: 'Terraform install'
+            inputs:
+              terraformVersion: 'latest'
+
+          - task: TerraformTask@5
+            displayName: 'Terraform init'
+            inputs:
+              provider: 'azurerm'
+              command: 'init'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/Terraform/Dev'
+              backendAzureRmUseEntraIdForAuthentication: false
+              backendServiceArm: 'Azure subscription 1(5fa73faf-6a16-4e4e-a3c0-a3f4f7415956)'
+              backendAzureRmResourceGroupName: 'stateFiles-RG'
+              backendAzureRmStorageAccountName: 'statefilesforp2'
+              backendAzureRmContainerName: 'devstatefiles'
+              backendAzureRmKey: 'dev.tfstate'
+
+          - task: TerraformTask@5
+            displayName: 'Terraform validate'
+            inputs:
+              provider: 'azurerm'
+              command: 'validate'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/Terraform/Dev'
+
+          - task: TerraformTask@5
+            displayName: 'Terraform plan'
+            inputs:
+              provider: 'azurerm'
+              command: 'plan'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/Terraform/Dev'
+              commandOptions: '--var-file="Dev.tfvars"'
+              environmentServiceNameAzureRM: 'Azure subscription 1(5fa73faf-6a16-4e4e-a3c0-a3f4f7415956)'
+
+          - task: TerraformTask@5
+            displayName: 'Terraform apply'
+            inputs:
+              provider: 'azurerm'
+              command: 'apply'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/Terraform/Dev'
+              commandOptions: '--var-file="Dev.tfvars" --auto-approve'
+              environmentServiceNameAzureRM: 'Azure subscription 1(5fa73faf-6a16-4e4e-a3c0-a3f4f7415956)'
