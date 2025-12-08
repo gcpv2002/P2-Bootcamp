@@ -1,0 +1,10 @@
+rgname-var = "Stage"
+location-var = "canadacentral"
+aksname-var = "Stage"
+dns-var = "Stage"
+aks-location-var = "canadacentral"
+aks-nodepool-var = "agentpool"
+aksrg-var = "Stage"
+min-count-var = 1
+max-count-var = 1
+node-vm-size-var = "Standard_D2ps_v6"

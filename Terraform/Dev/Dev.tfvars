@@ -1,0 +1,10 @@
+rgname-var = "Dev"
+location-var = "canadacentral"
+aksname-var = "Dev"
+dns-var = "Dev"
+aks-location-var = "canadacentral"
+aks-nodepool-var = "agentpool"
+aksrg-var = "Dev"
+min-count-var = 1
+max-count-var = 1
+node-vm-size-var = "Standard_D2ps_v6"
